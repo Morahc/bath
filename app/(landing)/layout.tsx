@@ -1,6 +1,8 @@
+import { Metadata } from "next";
+import NextTopLoader from "nextjs-toploader";
+
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
@@ -74,6 +76,7 @@ export default function LandingLayout({
 }>) {
   return (
     <div className="flex flex-col">
+      <NextTopLoader color="var(--primary)" />
       <Header />
       {children}
       <Footer />

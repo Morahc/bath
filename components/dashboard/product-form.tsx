@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileImage } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -54,7 +54,6 @@ const createFormSchema = (hasInitialData: boolean) =>
           .mime(["image/png", "image/jpeg"], "Invalid file type. Only images are allowed."),
   });
 
-
 export default function ProductForm() {
   const router = useRouter();
 
@@ -64,7 +63,6 @@ export default function ProductForm() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const [preview, setPreview] = useState<string | null>(null);
   const { setOpen, currentRow } = useProduct();
 
   const [isPending, startTransition] = useTransition();
@@ -88,7 +86,17 @@ export default function ProductForm() {
         },
   });
 
-  const image = form.watch("image");
+  const image = form.getValues("image");
+
+  const preview = useMemo(() => {
+    if (image instanceof File) {
+      return URL.createObjectURL(image);
+    }
+    if (currentRow?.image && typeof currentRow.image === "string") {
+      return process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL + currentRow.image;
+    }
+    return null;
+  }, [image, currentRow]);
 
   function handleClose() {
     setOpen(null);
@@ -135,24 +143,10 @@ export default function ProductForm() {
   }
 
   useEffect(() => {
-    if (image instanceof File) {
-      const objectUrl = URL.createObjectURL(image);
-      setPreview(objectUrl);
-      return () => URL.revokeObjectURL(objectUrl);
-    } else if (typeof image === "string") {
-      setPreview(image);
-    } else {
-      setPreview(null);
+    if (preview && image instanceof File) {
+      return () => URL.revokeObjectURL(preview);
     }
-  }, [image]);
-
-  useEffect(() => {
-    if (currentRow?.image && typeof currentRow.image === "string") {
-      setPreview(process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL + currentRow.image);
-    } else {
-      setPreview(null);
-    }
-  }, [currentRow]);
+  }, [preview, image]);
 
   if (isLoading) return <Skeleton className="h-full" />;
 
@@ -272,8 +266,10 @@ export default function ProductForm() {
                       {...rest}
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        onChange(file);
-                        e.target.value = "";
+                        if (file) {
+                          onChange(file);
+                          e.target.value = "";
+                        }
                       }}
                       id="file"
                       aria-invalid={fieldState.invalid}

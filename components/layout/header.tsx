@@ -19,12 +19,19 @@ export default function Header() {
           href="/"
           className="text-lg font-semibold tracking-tighter uppercase flex items-center gap-2 relative aspect-4/3"
         >
-          <Image src={"/images/logo.png"} alt="Classic Luxury Bathrooms" width={120} height={60} />
+          <Image
+            preload
+            src={"/images/logo.png"}
+            alt="Classic Luxury Bathrooms"
+            width={120}
+            height={60}
+          />
         </Link>
         <div className="hidden md:flex items-center gap-4">
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
             <Link
               href="/collections"
+              prefetch
               className={cn(buttonVariants({ variant: "secondary" }), "bg-white")}
             >
               Collections

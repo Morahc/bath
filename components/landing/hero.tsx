@@ -52,6 +52,7 @@ export default function Hero() {
         </div>
         <div className="relative aspect-4/3 md:aspect-square rounded-2xl overflow-hidden shadow-2xl">
           <Image
+            preload
             fill
             src="/images/hero-image.jpg"
             alt="Hero Image"

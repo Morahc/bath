@@ -1,8 +1,6 @@
 export default function Loading() {
   return (
-    <div
-      style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
-    >
+    <div className="flex items-center justify-center h-screen">
       <h1>Loading...</h1>
     </div>
   );

@@ -18,7 +18,7 @@ export default function DashboardHeader() {
           href="/"
           className="text-lg font-semibold tracking-tighter uppercase flex items-center gap-2"
         >
-          <Image src={"/images/logo.png"} alt="Classic Luxury Bathrooms" width={140} height={60} />
+          <Image src={"/images/logo.png"} alt="Classic Luxury Bathrooms" width={100} height={50} />
         </Link>
         <Button variant={"ghost"} onClick={() => setOpen((prev) => !prev)}>
           <Menu className="size-6" />

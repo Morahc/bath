@@ -7,7 +7,6 @@ import "./globals.css";
 const lato = Lato({
   variable: "--font-lato",
   weight: ["100", "300", "400", "700", "900"],
-  fallback: ["san-serif"],
   display: "swap",
   preload: true,
 });
@@ -25,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${lato.variable} relative antialiased`}>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+            {children}
+        </QueryProvider>
       </body>
     </html>
   );

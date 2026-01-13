@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FileImage } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -55,7 +55,6 @@ export default function CategoryForm({ open, setOpen, currentRow }: Props) {
   const router = useRouter();
 
   const [isPending, startTransition] = useTransition();
-  const [preview, setPreview] = useState<string | null>(null);
   const formSchema = useMemo(() => createFormSchema(!!currentRow), [currentRow]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -71,7 +70,17 @@ export default function CategoryForm({ open, setOpen, currentRow }: Props) {
         },
   });
 
-  const image = form.watch("image");
+  const image = form.getValues("image");
+
+  const preview = useMemo(() => {
+    if (image instanceof File) {
+      return URL.createObjectURL(image);
+    }
+    if (currentRow?.image && typeof currentRow.image === "string") {
+      return process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL + currentRow.image;
+    }
+    return null;
+  }, [image, currentRow]);
 
   function handleClose() {
     setOpen(false);
@@ -134,22 +143,10 @@ export default function CategoryForm({ open, setOpen, currentRow }: Props) {
   }, [open, currentRow, form]);
 
   useEffect(() => {
-    if (image instanceof File) {
-      const objectUrl = URL.createObjectURL(image);
-      setPreview(objectUrl);
-      return () => URL.revokeObjectURL(objectUrl);
-    } else {
-      setPreview(null);
+    if (preview && image instanceof File) {
+      return () => URL.revokeObjectURL(preview);
     }
-  }, [image]);
-
-  useEffect(() => {
-    if (currentRow?.image && typeof currentRow.image === "string") {
-      setPreview(process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL + currentRow.image);
-    } else {
-      setPreview(null);
-    }
-  }, [currentRow]);
+  }, [preview, image]);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
