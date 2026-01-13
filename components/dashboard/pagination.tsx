@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { cn, createQueryString } from "@/lib/utils";
+import { createQueryString } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 
 type PaginationProps = {

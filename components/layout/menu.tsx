@@ -1,12 +1,11 @@
 "use client";
 
-import { ArrowRight, Clock, LogOut, Mail, Phone } from "lucide-react";
+import { ArrowRight, Clock, Mail, Phone } from "lucide-react";
 import Link from "next/link";
 
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Button, buttonVariants } from "../ui/button";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "../ui/button";
 
 type Props = {
   open: boolean;

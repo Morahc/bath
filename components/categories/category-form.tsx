@@ -2,10 +2,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileImage } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
-import Image from "next/image";
 import * as z from "zod";
 
 import { createCategory, updateCategory } from "@/actions/category";
@@ -28,7 +28,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Category } from "@/types";
-import { slugify } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface Props {

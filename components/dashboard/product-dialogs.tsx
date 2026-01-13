@@ -21,7 +21,7 @@ export default function ProductDialogs() {
 
         setOpen(null);
         router.refresh();
-      } catch (error) {
+      } catch {
         toast.error("Failed to delete collection item");
       }
     });
