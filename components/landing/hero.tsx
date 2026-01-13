@@ -42,7 +42,10 @@ export default function Hero() {
             <Link className={cn(buttonVariants({ size: "lg" }))} href="/collections">
               View Collections
             </Link>
-            <Link className={cn(buttonVariants({ size: "lg", variant: "outline" }))} href="/#contact">
+            <Link
+              className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
+              href="/#contact"
+            >
               Visit Showroom
             </Link>
           </div>

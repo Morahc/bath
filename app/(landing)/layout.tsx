@@ -1,6 +1,5 @@
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
-import { ThemeProvider } from "@/context/theme-context";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -48,8 +47,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Classic Luxury Bathrooms",
-    description:
-      "Discover high quality luxury bathroom fixtures and sanitary wares.",
+    description: "Discover high quality luxury bathroom fixtures and sanitary wares.",
     images: ["/og-image.jpg"],
   },
 
@@ -75,12 +73,10 @@ export default function LandingLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <div className="flex flex-col">
-        <Header />
-        {children}
-        <Footer />
-      </div>
-    </ThemeProvider>
+    <div className="flex flex-col">
+      <Header />
+      {children}
+      <Footer />
+    </div>
   );
 }
