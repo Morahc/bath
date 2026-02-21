@@ -1,7 +1,6 @@
 import { getCollections } from "@/actions/collections";
 import PagePagination from "@/components/dashboard/pagination";
 import ProductButtons from "@/components/dashboard/product-buttons";
-import { columns } from "@/components/dashboard/product-column";
 import ProductDialogs from "@/components/dashboard/product-dialogs";
 import { ProductTable } from "@/components/dashboard/product-table";
 import ProductProvider from "@/context/product-context";
@@ -25,7 +24,7 @@ export default async function Dashboard({
             <ProductButtons />
           </div>
 
-          <ProductTable columns={columns} data={collections} />
+          <ProductTable data={collections} />
           <PagePagination
             currentPage={pagination.page}
             totalPages={pagination.totalPages}

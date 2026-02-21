@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { ArrowRight, Menu } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { MobileMenu } from "./menu";
 
 export default function Header() {
@@ -14,17 +14,16 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md shadow-xs w-full">
-      <nav className="flex justify-between items-center w-full max-w-7xl mx-auto h-16 md:h-18 px-4">
-        <Link
-          href="/"
-          className="text-lg font-semibold tracking-tighter uppercase flex items-center gap-2 relative aspect-4/3"
-        >
+      <nav className="flex justify-between items-center w-full max-w-7xl mx-auto h-16 md:h-18 px-4 py-2">
+        <Link href="/" className="relative">
           <Image
             preload
             src={"/images/logo.png"}
             alt="Classic Luxury Bathrooms"
-            width={120}
-            height={60}
+            sizes="(max-width: 110px) 100vw, (max-width: 150px) 50vw, 33vw"
+            fetchPriority="high"
+            width={110}
+            height={61}
           />
         </Link>
         <div className="hidden md:flex items-center gap-4">
@@ -32,7 +31,7 @@ export default function Header() {
             <Link
               href="/collections"
               prefetch
-              className={cn(buttonVariants({ variant: "secondary" }), "bg-white")}
+              className={cn(buttonVariants({ variant: "outline" }))}
             >
               Collections
             </Link>
@@ -43,7 +42,12 @@ export default function Header() {
             <ArrowRight />
           </Link>
         </div>
-        <Button variant={"link"} className="md:hidden" onClick={() => setOpen(true)}>
+        <Button
+          aria-label="Hamburger menu button"
+          variant={"link"}
+          className="md:hidden"
+          onClick={() => setOpen(true)}
+        >
           <Menu className="size-6" />
         </Button>
       </nav>

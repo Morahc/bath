@@ -14,11 +14,16 @@ export default function DashboardHeader() {
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md shadow-xs w-full">
       <nav className="flex justify-between items-center w-full max-w-7xl mx-auto h-16 md:h-18 px-4">
-        <Link
-          href="/"
-          className="text-lg font-semibold tracking-tighter uppercase flex items-center gap-2"
-        >
-          <Image src={"/images/logo.png"} alt="Classic Luxury Bathrooms" width={100} height={50} />
+        <Link href="/">
+          <Image
+            preload
+            src={"/images/logo.png"}
+            alt="Classic Luxury Bathrooms"
+            sizes="(max-width: 110px) 100vw, (max-width: 150px) 50vw, 33vw"
+            fetchPriority="high"
+            width={110}
+            height={61}
+          />
         </Link>
         <Button variant={"ghost"} onClick={() => setOpen((prev) => !prev)}>
           <Menu className="size-6" />

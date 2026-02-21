@@ -3,9 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileImage } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useTransition } from "react";
+import { cache, useEffect, useMemo, useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 import { getCategories } from "@/actions/category";
 import { createCollection, updateCollection } from "@/actions/collections";
@@ -29,7 +30,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useProduct } from "@/context/product-context";
-import { useQuery } from "@tanstack/react-query";
+import { Category } from "@/types";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Checkbox } from "../ui/checkbox";
@@ -56,12 +57,7 @@ const createFormSchema = (hasInitialData: boolean) =>
 
 export default function ProductForm() {
   const router = useRouter();
-
-  const { data: categories = [], isLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
-    staleTime: 5 * 60 * 1000,
-  });
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const { setOpen, currentRow } = useProduct();
 
@@ -125,8 +121,21 @@ export default function ProductForm() {
           await updateCollection({ id: currentRow.id, formData });
 
           handleClose();
-        } catch {
-          toast.error("Failed to delete collection");
+        } catch (error) {
+          if (error instanceof Error) {
+            Sentry.captureException(error, {
+              tags: {
+                action: "updateCollection",
+                step: "unexpected",
+              },
+              extra: {
+                errorType: error.constructor.name,
+                errorMessage: error.message,
+              },
+              level: "error",
+            });
+          }
+          toast.error("Failed to update collection");
         }
       });
     } else {
@@ -135,7 +144,21 @@ export default function ProductForm() {
           await createCollection(formData);
 
           handleClose();
-        } catch {
+        } catch (error) {
+          if (error instanceof Error) {
+            Sentry.captureException(error, {
+              tags: {
+                action: "createCollection",
+                step: "unexpected",
+              },
+              extra: {
+                errorType: error.constructor.name,
+                errorMessage: error.message,
+              },
+              level: "error",
+            });
+          }
+
           toast.error("Failed to create collection");
         }
       });
@@ -148,7 +171,20 @@ export default function ProductForm() {
     }
   }, [preview, image]);
 
-  if (isLoading) return <Skeleton className="h-full" />;
+  useEffect(() => {
+    const fetchCategories = cache(async () => {
+      try {
+        const data = await getCategories();
+
+        setCategories(data);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+    fetchCategories();
+  }, []);
+
+  if (categories.length == 0) return <Skeleton className="h-full" />;
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md mx-auto">

@@ -31,16 +31,18 @@ export default function Categories({ categories }: Props) {
                   alt={category.label}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               </div>
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-sm text-foreground">{category.label}</h3>
+                <h2 className="font-semibold text-sm text-foreground">{category.label}</h2>
                 <Link
                   href={`/collections?category=${category.value}`}
                   className={cn(
                     buttonVariants({ variant: "link", size: "link" }),
-                    "text-xs font-medium"
+                    "text-xs font-medium",
                   )}
+                  aria-label="View collection"
                 >
                   View collection
                   <span>→</span>

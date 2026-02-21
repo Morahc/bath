@@ -1,7 +1,9 @@
 "use server";
 
 import { cache } from "react";
+import sharp from "sharp"
 import { createClient } from "@/utils/supabase/server";
+import * as Sentry from "@sentry/nextjs";
 
 type GetCollectionsParams = {
   page?: number;
@@ -64,7 +66,24 @@ export const getCollections = cache(async (params: GetCollectionsParams = {}) =>
     .range(from, to)
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    if (error) {
+      Sentry.captureException(error, {
+        tags: {
+          action: "Get collections",
+          table: "Collection"
+        },
+        extra: {
+          errorCode: error.code,
+          errorMessage: error.message,
+          errorDetails: error.details,
+          hint: error.hint,
+        },
+        level: "error",
+      });
+    }
+    throw error;
+  }
 
   return {
     data: data || [],
@@ -91,18 +110,44 @@ export async function createCollection(formData: FormData) {
   if (!image) {
     throw new Error("Image is required");
   }
+  const arrayBuffer = await image.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
 
-  const fileExt = image.name.split(".").pop();
+  const resizedImageBuffer = await sharp(buffer)
+    .resize(400, 400, {
+      fit: "cover",
+      position: "center",
+    })
+    .webp({ quality: 80 })
+    .toBuffer();
+
+  const fileExt = "webp";
   const filePath = `/${crypto.randomUUID()}.${fileExt}`;
 
   const { error: uploadError, data } = await supabase.storage
     .from("images")
-    .upload(filePath, image, {
+    .upload(filePath, resizedImageBuffer, {
+      contentType: "image/webp",
       cacheControl: "3600",
       upsert: false,
     });
 
-  if (uploadError) throw uploadError;
+  if (uploadError) {
+    Sentry.captureException(uploadError, {
+      tags: {
+        action: "createCollection",
+        step: "imageUpload",
+        bucket: "images",
+      },
+      extra: {
+        filePath,
+        name,
+        errorMessage: uploadError.message,
+      },
+      level: "error",
+    });
+    throw uploadError;
+  }
 
   const { error } = await supabase
     .from("collections")
@@ -123,7 +168,7 @@ export async function deleteCollection(id: string) {
 
   const { data, error } = await supabase
     .from("collections")
-    .select("image")
+    .select("image, name")
     .eq("id", id)
     .single();
 
@@ -135,10 +180,28 @@ export async function deleteCollection(id: string) {
       .remove([data.image]);
   }
 
-  await supabase
+  const { error: deleteError } = await supabase
     .from("collections")
     .delete()
     .eq("id", id);
+
+  if (deleteError) {
+    Sentry.captureException(deleteError, {
+      tags: {
+        action: "createCategory",
+        step: "databaseDelete",
+        table: "categories",
+      },
+      extra: {
+        label: data.name,
+        errorCode: deleteError.code,
+        errorDetails: deleteError.details,
+        hint: deleteError.hint,
+      },
+      level: "error",
+    });
+    throw error;
+  }
 }
 
 export async function updateCollection({ id, formData }: { id: string, formData: FormData }) {
@@ -162,17 +225,44 @@ export async function updateCollection({ id, formData }: { id: string, formData:
   let imageUrl = existing.image;
 
   if (image) {
-    const fileExt = image.name.split(".").pop();
+    const arrayBuffer = await image.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const resizedImageBuffer = await sharp(buffer)
+      .resize(400, 400, {
+        fit: "cover",
+        position: "center",
+      })
+      .webp({ quality: 80 })
+      .toBuffer();
+
+    const fileExt = "webp";
     const filePath = `/${crypto.randomUUID()}.${fileExt}`;
 
     const { error: uploadError, data } = await supabase.storage
       .from("images")
-      .upload(filePath, image, {
+      .upload(filePath, resizedImageBuffer, {
+        contentType: "image/webp",
         cacheControl: "3600",
         upsert: false,
       });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      Sentry.captureException(uploadError, {
+        tags: {
+          action: "createCollection",
+          step: "imageUpload",
+          bucket: "images",
+        },
+        extra: {
+          filePath,
+          name,
+          errorMessage: uploadError.message,
+        },
+        level: "error",
+      });
+      throw uploadError;
+    }
 
     if (existing.image) {
       await supabase.storage
@@ -195,5 +285,22 @@ export async function updateCollection({ id, formData }: { id: string, formData:
     })
     .eq("id", id).select();
 
-  if (error) throw error
+  if (error) {
+    Sentry.captureException(error, {
+      tags: {
+        action: "createCollection",
+        step: "databaseUpdate",
+        table: "categories",
+      },
+      extra: {
+        name,
+        description,
+        errorCode: error.code,
+        errorDetails: error.details,
+        hint: error.hint,
+      },
+      level: "error",
+    });
+    throw error;
+  }
 }

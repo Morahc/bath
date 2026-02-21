@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { getCategories } from "@/actions/category";
@@ -6,7 +7,6 @@ import CategoryFilter from "@/components/category-filter";
 import ContactUs from "@/components/collection/contact-us";
 import PagePagination from "@/components/dashboard/pagination";
 import ProductList from "@/components/product-list";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Collections",

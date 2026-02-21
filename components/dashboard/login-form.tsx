@@ -1,9 +1,8 @@
 "use client";
 
-import * as z from "zod";
 import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
+import { login } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -14,20 +13,16 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "../ui/card";
-import { login } from "@/actions/auth";
 import { useTransition } from "react";
+import { Card, CardContent } from "../ui/card";
 
-const formSchema = z.object({
-  email: z.email().min(1, "This field is required"),
-  password: z.string().min(1, "This field is required"),
-});
-
-type LoginInput = z.infer<typeof formSchema>;
+type LoginInput = {
+  email: string;
+  password: string;
+};
 
 export default function LoginForm() {
   const form = useForm<LoginInput>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -37,7 +32,14 @@ export default function LoginForm() {
 
   async function onSubmit(data: LoginInput) {
     startTransition(async () => {
-      await login(data);
+      try {
+        await login(data);
+      } catch {
+        form.setError("root", {
+          type: "manual",
+          message: "Error Logging in",
+        });
+      }
     });
   }
 
@@ -55,6 +57,13 @@ export default function LoginForm() {
                 <Controller
                   name="email"
                   control={form.control}
+                  rules={{
+                    required: "Email is required",
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: "Invalid email address",
+                    },
+                  }}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="email">Email Address</FieldLabel>
@@ -71,6 +80,13 @@ export default function LoginForm() {
 
                 <Controller
                   name="password"
+                  rules={{
+                    required: "Password is required",
+                    min: {
+                      value: 8,
+                      message: "Must be 8 characters or more",
+                    },
+                  }}
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
@@ -93,6 +109,9 @@ export default function LoginForm() {
                 Login
               </Button>
             </Field>
+            {form.formState.errors.root && (
+              <div className="text-red-500 text-sm">{form.formState.errors.root.message}</div>
+            )}
           </FieldGroup>
         </CardContent>
       </Card>

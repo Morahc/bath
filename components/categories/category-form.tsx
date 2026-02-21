@@ -137,7 +137,7 @@ export default function CategoryForm({ open, setOpen, currentRow }: Props) {
           : {
               label: "",
               image: undefined,
-            }
+            },
       );
     }
   }, [open, currentRow, form]);
@@ -196,6 +196,7 @@ export default function CategoryForm({ open, setOpen, currentRow }: Props) {
                                     alt="Preview"
                                     fill
                                     className="w-full h-full object-cover"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                   />
                                   <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <span className="text-white text-sm">Click to change</span>

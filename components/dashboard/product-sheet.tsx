@@ -13,7 +13,7 @@ interface Props {
 export function ProductSheet({ open, setOpen, currentRow }: Props) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent>
+      <SheetContent className="bg-white">
         <SheetHeader>
           <SheetTitle>{!currentRow ? "Create product" : "Update product"}</SheetTitle>
         </SheetHeader>

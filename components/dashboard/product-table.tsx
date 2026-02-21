@@ -1,14 +1,16 @@
 "use client";
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  useReactTable
-} from "@tanstack/react-table";
-import { X } from "lucide-react";
+import { Ellipsis, SquarePen, Trash } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -17,24 +19,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useProduct } from "@/context/product-context";
+import { cn, formatter } from "@/lib/utils";
 import { Product } from "@/types";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import { useMemo, useState } from "react";
 
 interface DataTableProps {
-  columns: ColumnDef<Product>[];
   data: Product[];
 }
 
-export function ProductTable({ columns, data }: DataTableProps) {
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-  });
+export function ProductTable({ data }: DataTableProps) {
+  const [searchValue, setSearchValue] = useState("");
 
-  const isFiltered = table.getState().columnFilters.length > 0;
+  const filteredProducts = useMemo(() => {
+    if (!searchValue) return data;
+
+    return data.filter((product) => product.name.toLowerCase().includes(searchValue.toLowerCase()));
+  }, [data, searchValue]);
 
   return (
     <div className="space-y-4">
@@ -42,60 +44,106 @@ export function ProductTable({ columns, data }: DataTableProps) {
         <div className="flex flex-1 items-start gap-2 sm:flex-row sm:items-center sm:space-x-2">
           <Input
             placeholder="Filter products..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
             className="w-full md:w-80 bg-white"
           />
-          {isFiltered && (
-            <Button
-              variant="ghost"
-              onClick={() => table.resetColumnFilters()}
-              className="h-8 px-2 lg:px-3"
-            >
-              Reset
-              <X className="ml-2 h-4 w-4" />
-            </Button>
-          )}
         </div>
       </div>
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader className="bg-muted">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Featured</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+            {filteredProducts.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell>
+                  <div className="flex items-center gap-x-3 w-max">
+                    <Image
+                      src={process.env.NEXT_PUBLIC_SUPABASE_IMAGE_URL + row.image}
+                      alt={row.name}
+                      width={60}
+                      height={50}
+                      className="object-cover aspect-square"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                    <span>{row.name}</span>
+                  </div>
+                </TableCell>
+                <TableCell>{row.category.label}</TableCell>
+                <TableCell>{row.description}</TableCell>
+                <TableCell>
+                  <span
+                    className={cn(
+                      row.featured ? "bg-green-500" : "bg-destructive",
+                      "h-5 capitalize text-muted rounded-full px-3 flex items-center justify-center w-fit text-xs font-semibold",
+                    )}
+                  >
+                    {String(row.featured)}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="font-medium">{formatter.format(row.price)}</span>
+                </TableCell>
+                <TableCell>
+                  <ProductAction product={row} />
                 </TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </div>
     </div>
+  );
+}
+
+type ProductActionProps = {
+  product: Product;
+};
+
+function ProductAction({ product }: ProductActionProps) {
+  const { setCurrentRow, setOpen } = useProduct();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="data-[state=open]:bg-muted">
+          <Ellipsis size={14} />
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="space-y-2" align="end">
+        <DropdownMenuItem
+          onClick={() => {
+            setCurrentRow(product);
+            setOpen("update");
+          }}
+        >
+          Edit
+          <DropdownMenuShortcut>
+            <SquarePen className="size-3 md:size-4" />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            setCurrentRow(product);
+            setOpen("delete");
+          }}
+        >
+          Delete
+          <DropdownMenuShortcut>
+            <Trash className="size-3 md:size-4" />
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

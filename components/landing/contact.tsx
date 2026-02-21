@@ -16,7 +16,7 @@ const contactItems = [
   },
   {
     label: "Hours",
-    value: ["Mon–Fri: 9am – 6pm", "Sat: 10am – 4pm"],
+    value: ["Mon–Fri: 9am – 5pm", "Sat: 10am – 4pm"],
     icon: Clock,
   },
 ];
@@ -26,7 +26,7 @@ export default function Contact() {
     <section id="contact" className="grid lg:grid-cols-2">
       <ContactForm />
       <div className="p-4 md:p-12 flex flex-col gap-4 md:gap-6">
-        <h4 className="uppercase font-semibold tracking-wide">Visit our showroom</h4>
+        <p className="uppercase font-semibold tracking-wide">Visit our showroom</p>
         <h2 className="text-xl md:text-2xl font-medium tracking-widest">
           1024 Design District Blvd Metropolis, NY 10012
         </h2>
@@ -38,7 +38,7 @@ export default function Contact() {
               </div>
 
               <div>
-                <h5 className="text-sm font-semibold">{label}</h5>
+                <h3 className="text-sm font-semibold">{label}</h3>
 
                 <div>
                   {Array.isArray(value) ? (
@@ -59,6 +59,7 @@ export default function Contact() {
         <div className="space-y-4">
           <div className="rounded-3xl relative h-100 overflow-hidden shadow">
             <iframe
+              title="Store Location"
               loading="lazy"
               allowFullScreen
               className="h-full w-full"
@@ -66,12 +67,7 @@ export default function Contact() {
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2507.5370573890677!2d-122.41941529999999!3d37.7749295!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064b2555555%3A0x8800cb6c2b10db07!2s123%20Luxury%20Ln%2C%20San%20Francisco%2C%20CA%2094102!5e0!3m2!1sen!2sus!4v1234567890"
             />
           </div>
-          <a
-            href="https://www.google.com/maps/search/123+Luxury+Lane,+Bath+City"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(buttonVariants())}
-          >
+          <a href="/" target="_blank" rel="noopener noreferrer" className={cn(buttonVariants())}>
             Get Directions <MapPin />
           </a>
         </div>

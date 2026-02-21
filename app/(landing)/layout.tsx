@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     "toilets",
     "sinks",
     "jacuzzi",
+    "shelves",
     "bathroom accessories",
   ],
 
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
     siteName: "Classic Luxury Bathrooms",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Classic Luxury Bathrooms - Premium Sanitary Wares",
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Classic Luxury Bathrooms",
     description: "Discover high quality luxury bathroom fixtures and sanitary wares.",
-    images: ["/og-image.jpg"],
+    images: ["/og-image.png"],
   },
 
   robots: {
@@ -75,11 +76,11 @@ export default function LandingLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex flex-col">
-      <NextTopLoader color="var(--primary)" />
+    <main className="flex flex-col">
+      <NextTopLoader color="var(--primary)" showSpinner={false} />
       <Header />
       {children}
       <Footer />
-    </div>
+    </main>
   );
 }

@@ -19,23 +19,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import * as z from "zod";
 
-const formSchema = z.object({
-  fullName: z.string().min(1, "This field is required"),
-  interest: z.string().min(1, "This field is required"),
-  phone: z.string().min(1, "This field is required"),
-  email: z.email("This field is required"),
-  message: z.string().min(1, "This field is required"),
-});
-
-type ContactInput = z.infer<typeof formSchema>;
+type ContactInput = {
+  fullName: string;
+  interest: string;
+  phone: string;
+  email: string;
+  message: string;
+};
 
 export default function ContactForm() {
   const form = useForm<ContactInput>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: "",
       phone: "",
@@ -57,7 +52,7 @@ export default function ContactForm() {
             <FieldLegend className="text-2xl! tracking-wider font-semibold">
               Start your project
             </FieldLegend>
-            <FieldDescription>
+            <FieldDescription className="text-black">
               Visit our showroom or send us a message to check availability and pricing. We reply
               within 24 hours.
             </FieldDescription>
@@ -65,6 +60,9 @@ export default function ContactForm() {
             <FieldGroup>
               <Controller
                 name="fullName"
+                rules={{
+                  required: "This field is required",
+                }}
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
@@ -82,6 +80,13 @@ export default function ContactForm() {
 
               <Controller
                 name="email"
+                rules={{
+                  required: "This field is required",
+                  pattern: {
+                    value: /^\S+@\S+$/i,
+                    message: "Please enter a valid email address",
+                  },
+                }}
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
@@ -99,6 +104,7 @@ export default function ContactForm() {
 
               <Controller
                 name="interest"
+                rules={{ required: "This field is required" }}
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
@@ -118,6 +124,7 @@ export default function ContactForm() {
 
               <Controller
                 name="message"
+                rules={{ required: "This field is required" }}
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>

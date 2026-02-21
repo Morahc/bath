@@ -31,7 +31,7 @@ const data = [
 export default function Hero() {
   return (
     <section>
-      <div className="max-w-7xl mx-auto grid items-center gap-8 md:grid-cols-2 py-8 px-4 h-auto md:h-svh">
+      <div className="max-w-7xl mx-auto grid items-center gap-8 lg:grid-cols-2 py-8 px-4 h-auto md:h-svh">
         <div className="flex flex-col gap-4 md:gap-8">
           <h1 className="text-5xl md:text-4xl font-bold">Elevate Your Sanctuary</h1>
           <p className="text-2xl tracking-wide">
@@ -56,6 +56,7 @@ export default function Hero() {
             fill
             src="/images/hero-image.jpg"
             alt="Hero Image"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
           />
         </div>
